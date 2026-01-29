@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "OperationsTypes")
+@Table(name = "`OperationsTypes`")
 public class OperationType implements Serializable {
 
     @Id

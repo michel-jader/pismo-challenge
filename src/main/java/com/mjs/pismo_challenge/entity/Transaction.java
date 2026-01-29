@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Transactions")
+@Table(name = "`Transactions`")
 public class Transaction implements Serializable {
 
     @Id
