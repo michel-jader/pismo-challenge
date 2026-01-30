@@ -4,12 +4,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/pismo-challenge?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/pismo-challenge?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=pismo
       - SPRING_DATASOURCE_PASSWORD=pismo
-      - SPRING_FLYWAY_URL=jdbc:mysql://db:3306/pismo-challenge?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      - SPRING_FLYWAY_URL=jdbc:mysql://db:3306/pismo-challenge?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
       - SPRING_FLYWAY_USER=root
       - SPRING_FLYWAY_PASSWORD=root
+      - JAVA_OPTS=-Duser.timezone=UTC
     depends_on:
       db:
         condition: service_healthy
@@ -21,8 +22,11 @@ services:
       - MYSQL_USER=pismo
       - MYSQL_PASSWORD=pismo
       - MYSQL_ROOT_PASSWORD=root
+      # This sets the MySQL system time to UTC
+      - TZ=UTC
+    command: --default-time-zone='+00:00'
     ports:
-      - "3308:3306"
+      - "3306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 20s
