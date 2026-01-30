@@ -60,4 +60,36 @@ class TransactionIntegrationTest {
                 .body("operation_type_id", equalTo(1))
                 .body("amount", equalTo(100.00f)); // JSON numbers might be float/double
     }
+
+    @Test
+    void shouldReturnBadRequestWhenAmountIsNegative() {
+        CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(
+                1L,
+                1L,
+                new BigDecimal("-100.00"));
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(transactionRequest)
+                .when()
+                .post("/transactions")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void shouldReturnBadRequestWhenAmountIsZero() {
+        CreateTransactionRequestDTO transactionRequest = new CreateTransactionRequestDTO(
+                1L,
+                1L,
+                BigDecimal.ZERO);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body(transactionRequest)
+                .when()
+                .post("/transactions")
+                .then()
+                .statusCode(400);
+    }
 }

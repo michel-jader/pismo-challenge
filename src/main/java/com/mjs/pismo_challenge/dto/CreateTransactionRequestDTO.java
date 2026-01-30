@@ -1,6 +1,7 @@
 package com.mjs.pismo_challenge.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Positive;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -13,6 +14,7 @@ public class CreateTransactionRequestDTO implements Serializable {
     private Long operationTypeId;
 
     @JsonProperty("amount")
+    @Positive
     private BigDecimal amount;
 
     public CreateTransactionRequestDTO() {
