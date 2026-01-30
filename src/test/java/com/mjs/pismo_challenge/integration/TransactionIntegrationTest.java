@@ -58,7 +58,7 @@ class TransactionIntegrationTest {
                 .body("transaction_id", notNullValue()) // Assuming API returns transaction_id
                 .body("account_id", equalTo(accountId))
                 .body("operation_type_id", equalTo(1))
-                .body("amount", equalTo(100.00f)); // JSON numbers might be float/double
+                .body("amount", equalTo(-100.00f)); // JSON numbers might be float/double
     }
 
     @Test

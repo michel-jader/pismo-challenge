@@ -4,6 +4,7 @@ import com.mjs.pismo_challenge.dto.AccountResponseDTO;
 import com.mjs.pismo_challenge.dto.CreateAccountRequestDTO;
 import com.mjs.pismo_challenge.dto.CreateTransactionRequestDTO;
 import com.mjs.pismo_challenge.dto.TransactionResponseDTO;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,8 +43,27 @@ class TransactionServiceTest {
         assertNotNull(response.getTransactionId());
         assertEquals(account.getAccountId(), response.getAccountId());
         assertEquals(1L, response.getOperationTypeId());
-        assertEquals(new BigDecimal("150.00"), response.getAmount());
+        assertEquals(new BigDecimal("-150.00"), response.getAmount());
     }
+
+    @Test
+    void shouldThrowExceptionWhenTransactionAmountNotPositive() {
+        // Create account first
+        CreateAccountRequestDTO accountRequest = new CreateAccountRequestDTO("55544433322");
+        AccountResponseDTO account = accountService.createAccount(accountRequest);
+
+        CreateTransactionRequestDTO request = new CreateTransactionRequestDTO(
+                account.getAccountId(),
+                1L, // CASH PURCHASE
+                new BigDecimal("-150.00")); // Service WILL ONLY ACCEPT positive amounts
+
+        Exception exception = assertThrows(ConstraintViolationException.class, () -> {
+            transactionService.createTransaction(request);
+        });
+
+        assertTrue(exception.getMessage().contains("createTransaction.transactionDTO.amount: must be greater than 0"));
+    }
+
 
     @Test
     void shouldThrowExceptionWhenAccountNotFound() {

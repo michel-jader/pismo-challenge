@@ -15,11 +15,21 @@ public class OperationType implements Serializable {
     @Column(name = "Description")
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Direction", nullable = false)
+    private OperationDirection direction;
+
+    public enum OperationDirection {
+        CREDIT,
+        DEBIT
+    }
+
     public OperationType() {
     }
 
-    public OperationType(String description) {
+    public OperationType(String description, OperationDirection direction) {
         this.description = description;
+        this.direction = direction;
     }
 
     public Long getOperationTypeId() {
@@ -36,5 +46,13 @@ public class OperationType implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public OperationDirection getDirection() {
+        return direction;
+    }
+
+    public void setDirection(OperationDirection direction) {
+        this.direction = direction;
     }
 }

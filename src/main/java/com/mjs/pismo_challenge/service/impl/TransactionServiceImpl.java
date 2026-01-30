@@ -12,6 +12,7 @@ import com.mjs.pismo_challenge.service.TransactionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -39,7 +40,15 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Operation Type not found with ID: " + transactionDTO.getOperationTypeId()));
 
-        Transaction transaction = new Transaction(account, operationType, transactionDTO.getAmount(),
+        BigDecimal transactionAmount = null;
+
+        if (OperationType.OperationDirection.DEBIT.equals(operationType.getDirection())) {
+            transactionAmount = transactionDTO.getAmount().negate();
+        } else {
+            transactionAmount = transactionDTO.getAmount();
+        }
+
+        Transaction transaction = new Transaction(account, operationType, transactionAmount,
                 LocalDateTime.now());
         Transaction savedTransaction = transactionRepository.save(transaction);
 

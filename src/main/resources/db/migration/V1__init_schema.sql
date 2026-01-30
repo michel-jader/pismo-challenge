@@ -5,7 +5,8 @@ CREATE TABLE Accounts (
 
 CREATE TABLE OperationsTypes (
     OperationType_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    Description VARCHAR(100)
+    Description VARCHAR(100),
+    Direction ENUM('CREDIT', 'DEBIT') NOT NULL
 );
 
 CREATE TABLE Transactions (
