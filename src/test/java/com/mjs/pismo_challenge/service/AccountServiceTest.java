@@ -41,8 +41,10 @@ class AccountServiceTest {
     }
 
     @Test
-    void shouldReturnNullWhenAccountNotFound() {
-        AccountResponseDTO found = accountService.getAccountById(9999L);
-        assertNull(found);
+    void shouldThrowExceptionWhenAccountNotFound() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.getAccountById(9999L);
+        });
+        assertTrue(exception.getMessage().contains("Account not found"));
     }
 }

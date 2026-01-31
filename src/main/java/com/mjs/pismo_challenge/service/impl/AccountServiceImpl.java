@@ -30,6 +30,7 @@ public class AccountServiceImpl implements AccountService {
     public AccountResponseDTO getAccountById(Long accountId) {
         return accountRepository.findById(accountId)
                 .map(account -> new AccountResponseDTO(account.getAccountId(), account.getDocumentNumber()))
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Account not found with ID: " + accountId));
     }
 }
