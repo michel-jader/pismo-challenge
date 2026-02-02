@@ -9,6 +9,8 @@ import com.mjs.pismo_challenge.repository.AccountRepository;
 import com.mjs.pismo_challenge.repository.OperationTypeRepository;
 import com.mjs.pismo_challenge.repository.TransactionRepository;
 import com.mjs.pismo_challenge.service.TransactionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
@@ -32,13 +36,21 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionResponseDTO createTransaction(CreateTransactionRequestDTO transactionDTO) {
+        log.info("Processing transaction for account ID: {} and operation type ID: {}",
+                transactionDTO.getAccountId(), transactionDTO.getOperationTypeId());
+
         Account account = accountRepository.findById(transactionDTO.getAccountId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Account not found with ID: " + transactionDTO.getAccountId()));
+                .orElseThrow(() -> {
+                    log.error("Account not found for transaction: {}", transactionDTO.getAccountId());
+                    return new IllegalArgumentException("Account not found with ID: " + transactionDTO.getAccountId());
+                });
 
         OperationType operationType = operationTypeRepository.findById(transactionDTO.getOperationTypeId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Operation Type not found with ID: " + transactionDTO.getOperationTypeId()));
+                .orElseThrow(() -> {
+                    log.error("Operation Type not found: {}", transactionDTO.getOperationTypeId());
+                    return new IllegalArgumentException(
+                            "Operation Type not found with ID: " + transactionDTO.getOperationTypeId());
+                });
 
         BigDecimal transactionAmount = null;
 
@@ -47,10 +59,12 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             transactionAmount = transactionDTO.getAmount();
         }
+        log.debug("Calculated transaction amount: {}", transactionAmount);
 
         Transaction transaction = new Transaction(account, operationType, transactionAmount,
                 LocalDateTime.now());
         Transaction savedTransaction = transactionRepository.save(transaction);
+        log.info("Transaction processed successfully with ID: {}", savedTransaction.getTransactionId());
 
         return new TransactionResponseDTO(
                 savedTransaction.getTransactionId(),
