@@ -3,12 +3,16 @@ package com.mjs.pismo_challenge.service.impl;
 import com.mjs.pismo_challenge.dto.AccountResponseDTO;
 import com.mjs.pismo_challenge.dto.CreateAccountRequestDTO;
 import com.mjs.pismo_challenge.entity.Account;
+import com.mjs.pismo_challenge.exception.ResourceNotFoundException;
 import com.mjs.pismo_challenge.repository.AccountRepository;
 import com.mjs.pismo_challenge.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.mjs.pismo_challenge.utils.CONSTANTS.ACCOUNT_RESOURCE;
+import static com.mjs.pismo_challenge.utils.CONSTANTS.ACCOUNT_RESOURCE_ID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -42,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
                 })
                 .orElseThrow(() -> {
                     log.warn("Account not found with ID: {}", accountId);
-                    return new IllegalArgumentException("Account not found with ID: " + accountId);
+                    return new ResourceNotFoundException(ACCOUNT_RESOURCE,  ACCOUNT_RESOURCE_ID, accountId);
                 });
     }
 }

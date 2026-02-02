@@ -2,6 +2,7 @@ package com.mjs.pismo_challenge.service;
 
 import com.mjs.pismo_challenge.dto.AccountResponseDTO;
 import com.mjs.pismo_challenge.dto.CreateAccountRequestDTO;
+import com.mjs.pismo_challenge.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,9 +43,9 @@ class AccountServiceTest {
 
     @Test
     void shouldThrowExceptionWhenAccountNotFound() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
             accountService.getAccountById(9999L);
         });
-        assertTrue(exception.getMessage().contains("Account not found"));
+        assertTrue(exception.getMessage().contains("Account not found with ID : '9999'"));
     }
 }

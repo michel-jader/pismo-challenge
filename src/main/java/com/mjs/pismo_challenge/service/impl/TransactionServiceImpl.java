@@ -5,6 +5,7 @@ import com.mjs.pismo_challenge.dto.TransactionResponseDTO;
 import com.mjs.pismo_challenge.entity.Account;
 import com.mjs.pismo_challenge.entity.OperationType;
 import com.mjs.pismo_challenge.entity.Transaction;
+import com.mjs.pismo_challenge.exception.ResourceNotFoundException;
 import com.mjs.pismo_challenge.repository.AccountRepository;
 import com.mjs.pismo_challenge.repository.OperationTypeRepository;
 import com.mjs.pismo_challenge.repository.TransactionRepository;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import static com.mjs.pismo_challenge.utils.CONSTANTS.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -42,14 +45,13 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = accountRepository.findById(transactionDTO.getAccountId())
                 .orElseThrow(() -> {
                     log.error("Account not found for transaction: {}", transactionDTO.getAccountId());
-                    return new IllegalArgumentException("Account not found with ID: " + transactionDTO.getAccountId());
+                    return new ResourceNotFoundException(ACCOUNT_RESOURCE,  ACCOUNT_RESOURCE_ID, transactionDTO.getAccountId());
                 });
 
         OperationType operationType = operationTypeRepository.findById(transactionDTO.getOperationTypeId())
                 .orElseThrow(() -> {
                     log.error("Operation Type not found: {}", transactionDTO.getOperationTypeId());
-                    return new IllegalArgumentException(
-                            "Operation Type not found with ID: " + transactionDTO.getOperationTypeId());
+                    return new ResourceNotFoundException(OPERATION_TYPE_RESOURCE,  OPERATION_TYPE_RESOURCE_ID, transactionDTO.getOperationTypeId());
                 });
 
         BigDecimal transactionAmount = null;

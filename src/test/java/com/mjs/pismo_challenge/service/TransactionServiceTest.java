@@ -4,6 +4,7 @@ import com.mjs.pismo_challenge.dto.AccountResponseDTO;
 import com.mjs.pismo_challenge.dto.CreateAccountRequestDTO;
 import com.mjs.pismo_challenge.dto.CreateTransactionRequestDTO;
 import com.mjs.pismo_challenge.dto.TransactionResponseDTO;
+import com.mjs.pismo_challenge.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,11 +73,11 @@ class TransactionServiceTest {
                 1L,
                 new BigDecimal("100.00"));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
             transactionService.createTransaction(request);
         });
 
-        assertTrue(exception.getMessage().contains("Account not found"));
+        assertTrue(exception.getMessage().contains("Account not found with ID : '9999'"));
     }
 
     @Test
@@ -90,10 +91,10 @@ class TransactionServiceTest {
                 99L, // Invalid Operation Type
                 new BigDecimal("100.00"));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
             transactionService.createTransaction(request);
         });
 
-        assertTrue(exception.getMessage().contains("Operation Type not found"));
+        assertTrue(exception.getMessage().contains("OperationType not found with ID : '99'"));
     }
 }
