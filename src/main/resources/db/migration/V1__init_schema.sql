@@ -14,6 +14,7 @@ CREATE TABLE Transactions (
     Account_ID BIGINT,
     OperationType_ID BIGINT,
     Amount DECIMAL(19, 4) NOT NULL,
+    Balance DECIMAL(19, 4) NOT NULL,
     EventDate DATETIME(6) NOT NULL,
     FOREIGN KEY (Account_ID) REFERENCES Accounts(Account_ID),
     FOREIGN KEY (OperationType_ID) REFERENCES OperationsTypes(OperationType_ID)

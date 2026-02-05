@@ -25,14 +25,18 @@ public class Transaction implements Serializable {
     @Column(name = "Amount", nullable = false)
     private BigDecimal amount;
 
+    @Column(name = "Balance", nullable = false)
+    private BigDecimal balance;
+
     @Column(name = "EventDate", nullable = false)
     private LocalDateTime eventDate;
 
     public Transaction() {
     }
 
-    public Transaction(Account account, OperationType operationType, BigDecimal amount, LocalDateTime eventDate) {
+    public Transaction(Account account, OperationType operationType, BigDecimal amount, BigDecimal balance, LocalDateTime eventDate) {
         this.account = account;
+        this.balance = balance;
         this.operationType = operationType;
         this.amount = amount;
         this.eventDate = eventDate;
@@ -76,5 +80,13 @@ public class Transaction implements Serializable {
 
     public void setEventDate(LocalDateTime eventDate) {
         this.eventDate = eventDate;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }

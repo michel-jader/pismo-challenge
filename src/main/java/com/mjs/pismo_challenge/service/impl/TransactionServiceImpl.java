@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.mjs.pismo_challenge.utils.CONSTANTS.*;
 
@@ -34,6 +37,72 @@ public class TransactionServiceImpl implements TransactionService {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.operationTypeRepository = operationTypeRepository;
+    }
+
+    private BigDecimal discharge(
+            OperationType.OperationDirection operationDirection,
+            Long accountId,
+            BigDecimal currentAmount
+            ) {
+
+        if (OperationType.OperationDirection.DEBIT.equals(operationDirection)) {
+            return currentAmount;
+        }
+
+        //FIXME: get fom DB where direction is DEBIT
+        // OR evolve query to join with op. type and get only DEBIT ones
+        // OperationType IDs to discharge
+        List<Long> operationTypeIds = Arrays.asList(1L, 2L, 3L);
+
+        List<Transaction> transactionsShouldDischarge = transactionRepository.findAllToDischarge(accountId, operationTypeIds);
+
+        List<Transaction> transactionsToDischarge = new ArrayList<>();
+
+        //FIXME: is it a good way to create new BigDecimal.... check and evolve if needed
+        BigDecimal totalAvailable = BigDecimal.valueOf(currentAmount.floatValue());
+
+        for (Transaction t : transactionsShouldDischarge) {
+
+            BigDecimal newBalance = new BigDecimal(t.getBalance().floatValue());
+
+            BigDecimal amountToDischarge = t.getBalance();
+
+            if (totalAvailable.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
+
+            if (totalAvailable.compareTo(amountToDischarge) >= 0) {
+
+                // tA = 100
+                // aD = 50
+
+                // tA = 50
+                // aD = 50
+
+                totalAvailable = totalAvailable.subtract(amountToDischarge.negate());
+                t.setBalance(BigDecimal.ZERO);
+                transactionsToDischarge.add(t);
+
+            } else {
+
+                // tA = 10
+                // aD = 50
+
+                t.setBalance(amountToDischarge.negate().subtract(totalAvailable));
+                totalAvailable = BigDecimal.ZERO;
+                transactionsToDischarge.add(t);
+
+            }
+
+        }
+
+        if (!transactionsToDischarge.isEmpty()) {
+            transactionRepository.saveAll(transactionsToDischarge);
+        }
+
+        return totalAvailable;
+
+
     }
 
     @Override
@@ -63,8 +132,12 @@ public class TransactionServiceImpl implements TransactionService {
         }
         log.debug("Calculated transaction amount: {}", transactionAmount);
 
-        Transaction transaction = new Transaction(account, operationType, transactionAmount,
+        //FIXME Impl balance mechanics
+        BigDecimal balance = discharge(operationType.getDirection(), account.getAccountId(), transactionAmount);
+
+        Transaction transaction = new Transaction(account, operationType, transactionAmount, balance,
                 LocalDateTime.now());
+
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction processed successfully with ID: {}", savedTransaction.getTransactionId());
 
