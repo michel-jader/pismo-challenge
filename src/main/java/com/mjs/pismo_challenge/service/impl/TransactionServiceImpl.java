@@ -63,15 +63,13 @@ public class TransactionServiceImpl implements TransactionService {
 
         for (Transaction t : transactionsShouldDischarge) {
 
-            BigDecimal newBalance = new BigDecimal(t.getBalance().floatValue());
-
-            BigDecimal amountToDischarge = t.getBalance();
+            BigDecimal newBalance = new BigDecimal(t.getBalance().floatValue()).negate();
 
             if (totalAvailable.compareTo(BigDecimal.ZERO) <= 0) {
                 break;
             }
 
-            if (totalAvailable.compareTo(amountToDischarge) >= 0) {
+            if (totalAvailable.compareTo(newBalance) >= 0) {
 
                 // tA = 100
                 // aD = 50
@@ -79,7 +77,7 @@ public class TransactionServiceImpl implements TransactionService {
                 // tA = 50
                 // aD = 50
 
-                totalAvailable = totalAvailable.subtract(amountToDischarge.negate());
+                totalAvailable = totalAvailable.subtract(newBalance);
                 t.setBalance(BigDecimal.ZERO);
                 transactionsToDischarge.add(t);
 
@@ -88,7 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
                 // tA = 10
                 // aD = 50
 
-                t.setBalance(amountToDischarge.negate().subtract(totalAvailable));
+                t.setBalance(newBalance.subtract(totalAvailable).negate());
                 totalAvailable = BigDecimal.ZERO;
                 transactionsToDischarge.add(t);
 
@@ -101,7 +99,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         return totalAvailable;
-
 
     }
 
